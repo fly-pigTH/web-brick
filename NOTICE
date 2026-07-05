@@ -1,0 +1,6 @@
+Converted set geometry under sets/ is derived from:
+- LDraw parts library (https://www.ldraw.org), CC-BY 2.0
+- LDraw Official Model Repository (https://library.ldraw.org/omr), CC-BY 2.0
+  42107 model by Philippe Hurbain (Philo); 42056 / 8880 models by their
+  respective OMR authors.
+Vendored libraries under lib/ and utils/: Three.js (MIT).

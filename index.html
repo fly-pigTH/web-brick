@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<title>SOFT BRICKS · 拼装模拟器</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { overflow: hidden; font-family: -apple-system, "PingFang SC", sans-serif; background: #16181d; }
+  #c { display: block; width: 100vw; height: 100vh; }
+  #hud {
+    position: fixed; top: 16px; left: 16px; color: #eceff4;
+    background: rgba(15,16,20,.82); border-radius: 14px; padding: 14px 18px;
+    font-size: 14px; line-height: 1.7; backdrop-filter: blur(8px); user-select: none;
+  }
+  #hud b { font-size: 17px; letter-spacing: .5px; }
+  #hud .dim { color: #9aa0ac; font-size: 12px; }
+  #bar {
+    position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 10px; background: rgba(15,16,20,.82); padding: 10px 14px;
+    border-radius: 14px; backdrop-filter: blur(8px);
+  }
+  button {
+    background: #262a33; color: #eceff4; border: 0; border-radius: 9px;
+    padding: 9px 16px; font-size: 14px; cursor: pointer;
+  }
+  button:hover { background: #333947; }
+  button.acc { background: #c0121a; }
+  button.acc:hover { background: #d8232b; }
+  #prog { position: fixed; bottom: 0; left: 0; height: 4px; background: #c0121a; width: 0; transition: width .25s; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hud">
+  <b id="title">加载中…</b>
+  <select id="setsel" style="margin-left:10px;background:#262a33;color:#eceff4;border:0;border-radius:7px;padding:4px 8px;font-size:13px"></select><br>
+  <span id="stat"></span><br>
+  <span class="dim">点击发光零件安装 · 空格=装完本步 · 拖动旋转视角</span>
+</div>
+<div id="bar">
+  <button id="prev">◀ 上一步</button>
+  <button id="auto" class="acc">▶ 自动拼装</button>
+  <button id="next">下一步 ▶</button>
+  <button id="explode">💥 爆炸视图</button>
+  <button id="reset">⟲ 重来</button>
+</div>
+<div id="prog"></div>
+<script type="importmap">
+{ "imports": { "three": "./lib/three.module.js" } }
+</script>
+<script type="module" src="app.js"></script>
+</body>
+</html>
