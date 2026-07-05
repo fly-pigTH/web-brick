@@ -3,10 +3,11 @@
 <head>
 <meta charset="utf-8">
 <title>SOFT BRICKS · 拼装模拟器</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { overflow: hidden; font-family: -apple-system, "PingFang SC", sans-serif; background: #16181d; }
+  body { overflow: hidden; font-family: -apple-system, "PingFang SC", sans-serif; background: #16181d; overscroll-behavior: none; }
+  #c { touch-action: none; }
   #c { display: block; width: 100vw; height: 100vh; }
   #hud {
     position: fixed; top: 16px; left: 16px; color: #eceff4;
@@ -30,6 +31,19 @@
   button.acc { background: #c0121a; }
   button.acc:hover { background: #d8232b; }
   #prog { position: fixed; bottom: 0; left: 0; height: 4px; background: #c0121a; width: 0; transition: width .25s; }
+  #seek::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #e8323c; }
+  #seek { -webkit-appearance: none; background: #3a3f4b; border-radius: 4px; height: 8px; }
+  @media (max-width: 640px), (pointer: coarse) and (max-height: 500px) {
+    #hud { top: 8px; left: 8px; right: 8px; padding: 9px 12px; font-size: 12px; line-height: 1.5; border-radius: 11px; }
+    #hud b { font-size: 15px; }
+    #hud .dim { font-size: 10px; }
+    #setsel { font-size: 12px; max-width: 46vw; }
+    #bar { width: calc(100vw - 16px); bottom: calc(8px + env(safe-area-inset-bottom)); padding: 9px 10px; gap: 7px; border-radius: 12px; }
+    #btns { gap: 6px; }
+    #btns button { flex: 1; padding: 11px 0; font-size: 14px; min-height: 42px; }
+    #seek { height: 10px; }
+    #seek::-webkit-slider-thumb { width: 24px; height: 24px; }
+  }
 </style>
 </head>
 <body>

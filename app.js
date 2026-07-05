@@ -4,10 +4,11 @@ import { GLTFLoader } from './lib/GLTFLoader.js';
 
 const SET = new URLSearchParams(location.search).get('set') || '42107';
 
+const MOBILE = matchMedia('(pointer: coarse)').matches;
 const canvas = document.getElementById('c');
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-renderer.shadowMap.enabled = true;
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: !MOBILE, powerPreference: 'high-performance' });
+renderer.setPixelRatio(Math.min(devicePixelRatio, MOBILE ? 1.5 : 2));
+renderer.shadowMap.enabled = !MOBILE;   // 手机关阴影: 3000 件模型阴影会让 draw call 翻倍
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x1a1d24);
@@ -78,7 +79,7 @@ for (const inst of meta.instances) {
   // MuJoCo z-up -> three y-up: 外层容器旋转
   for (const mid of inst.ms) {
     const mesh = new THREE.Mesh(geos[mid], matFor(mid));
-    mesh.castShadow = true;
+    mesh.castShadow = !MOBILE;
     mesh.userData.mid = mid;
     grp.add(mesh);
   }
@@ -160,11 +161,11 @@ document.getElementById('prev').onclick = () => jumpTo(page - 1);
 document.getElementById('reset').onclick = () => { stopAuto(); exploded = false; jumpTo(0); };
 document.getElementById('explode').onclick = () => { exploded = !exploded; };
 function stopAuto() {
-  if (autoTimer) { clearInterval(autoTimer); autoTimer = null; document.getElementById('auto').textContent = '▶ 自动拼装'; }
+  if (autoTimer) { clearInterval(autoTimer); autoTimer = null; document.getElementById('auto').textContent = MOBILE ? '▶ 自动' : '▶ 自动拼装'; }
 }
 document.getElementById('auto').onclick = () => {
   if (autoTimer) { stopAuto(); return; }
-  document.getElementById('auto').textContent = '⏸ 暂停';
+  document.getElementById('auto').textContent = MOBILE ? '⏸' : '⏸ 暂停';
   autoTimer = setInterval(() => {
     for (let k = 0; k < SPEEDS[speedIdx]; k++) {
       const next = pagesParts[page]?.find(p => !p.placed);
@@ -174,18 +175,41 @@ document.getElementById('auto').onclick = () => {
     }
   }, 100);
 };
+if (MOBILE) {
+  document.getElementById('prev').textContent = '◀';
+  document.getElementById('next').textContent = '▶';
+  document.getElementById('explode').textContent = '💥';
+  document.getElementById('reset').textContent = '⟲';
+  document.getElementById('auto').textContent = '▶ 自动';
+  document.querySelector('#hud .dim').textContent = '轻点发光零件安装 · 单指旋转 · 双指缩放';
+}
 addEventListener('keydown', e => {
   if (e.code === 'Space') { e.preventDefault(); pagesParts[page]?.forEach(place); }
 });
 
-// 点击安装
+// 点击/触摸安装: 只在"轻点"时触发 (位移<10px 且 <400ms), 拖动旋转不误触
 const ray = new THREE.Raycaster(), ptr = new THREE.Vector2();
-canvas.addEventListener('pointerdown', e => {
-  ptr.set((e.clientX / innerWidth) * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
+let downX = 0, downY = 0, downT = 0;
+function tryPlaceAt(x, y) {
+  ptr.set((x / innerWidth) * 2 - 1, -(y / innerHeight) * 2 + 1);
   ray.setFromCamera(ptr, camera);
-  const ghosts = pagesParts[page]?.filter(p => !p.placed).flatMap(p => p.grp.children) || [];
-  const hit = ray.intersectObjects(ghosts, false)[0];
-  if (hit) place(hit.object.parent.userData.part);
+  const gp = pagesParts[page]?.filter(p => !p.placed) || [];
+  const hit = ray.intersectObjects(gp.flatMap(p => p.grp.children), false)[0];
+  if (hit) { place(hit.object.parent.userData.part); return; }
+  let best = null, bd = MOBILE ? 44 : 28;      // 手指容差: 投影中心最近的幽灵件
+  const v = new THREE.Vector3();
+  for (const p of gp) {
+    p.grp.getWorldPosition(v);
+    v.project(camera);
+    const d = Math.hypot((v.x + 1) / 2 * innerWidth - x, (-v.y + 1) / 2 * innerHeight - y);
+    if (d < bd) { bd = d; best = p; }
+  }
+  if (best) place(best);
+}
+canvas.addEventListener('pointerdown', e => { downX = e.clientX; downY = e.clientY; downT = performance.now(); });
+canvas.addEventListener('pointerup', e => {
+  if (Math.hypot(e.clientX - downX, e.clientY - downY) < 10 && performance.now() - downT < 400)
+    tryPlaceAt(e.clientX, e.clientY);
 });
 
 // ---------------- 动画循环
