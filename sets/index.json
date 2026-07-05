@@ -1,5 +1,26 @@
 [
-  {"id": "42107", "name": "Ducati Panigale V4 R", "parts": 642, "steps": 105},
-  {"id": "42056", "name": "Porsche 911 GT3 RS", "parts": 3111, "steps": 373},
-  {"id": "8880", "name": "Super Car (1994)", "parts": 1418, "steps": 216}
+  {
+    "id": "42107",
+    "name": "Ducati Panigale V4 R",
+    "parts": 642,
+    "steps": 105
+  },
+  {
+    "id": "42056",
+    "name": "Porsche 911 GT3 RS",
+    "parts": 3111,
+    "steps": 373
+  },
+  {
+    "id": "8880",
+    "name": "Super Car (1994)",
+    "parts": 1418,
+    "steps": 216
+  },
+  {
+    "id": "10179",
+    "name": "Millennium Falcon UCS (重型)",
+    "parts": 5253,
+    "steps": 942
+  }
 ]
