@@ -44,6 +44,8 @@ for (const s of setIndex) {
 sel.onchange = () => location.search = '?set=' + sel.value;
 
 const meta = await (await fetch(`sets/${SET}/set.json`)).json();
+const seek = document.getElementById('seek');
+seek.max = meta.pages;
 const gltf = await new GLTFLoader().loadAsync(`sets/${SET}/lib.glb`);
 const geos = {};
 gltf.scene.traverse(n => { if (n.isMesh) geos[n.name] = n.geometry; });
@@ -129,6 +131,7 @@ function refresh() {
   document.getElementById('stat').textContent =
     `步骤 ${Math.min(page + 1, meta.pages)}/${meta.pages} · 零件 ${placedCount}/${meta.count}`;
   document.getElementById('prog').style.width = (100 * placedCount / meta.count) + '%';
+  seek.value = page;
 }
 function place(part) {
   if (part.placed || part.page !== page) return;
@@ -145,6 +148,13 @@ function jumpTo(np) {
   refresh();
 }
 
+seek.addEventListener('input', () => jumpTo(+seek.value));
+const SPEEDS = [1, 2, 4, 8];
+let speedIdx = 0;
+document.getElementById('speed').onclick = () => {
+  speedIdx = (speedIdx + 1) % SPEEDS.length;
+  document.getElementById('speed').textContent = SPEEDS[speedIdx] + '\u00d7';
+};
 document.getElementById('next').onclick = () => jumpTo(page + 1);
 document.getElementById('prev').onclick = () => jumpTo(page - 1);
 document.getElementById('reset').onclick = () => { stopAuto(); exploded = false; jumpTo(0); };
@@ -156,9 +166,13 @@ document.getElementById('auto').onclick = () => {
   if (autoTimer) { stopAuto(); return; }
   document.getElementById('auto').textContent = '⏸ 暂停';
   autoTimer = setInterval(() => {
-    const next = pagesParts[page]?.find(p => !p.placed);
-    if (next) place(next); else if (page < meta.pages) jumpTo(page + 1); else stopAuto();
-  }, 120);
+    for (let k = 0; k < SPEEDS[speedIdx]; k++) {
+      const next = pagesParts[page]?.find(p => !p.placed);
+      if (next) place(next);
+      else if (page < meta.pages) { jumpTo(page + 1); }
+      else { stopAuto(); break; }
+    }
+  }, 100);
 };
 addEventListener('keydown', e => {
   if (e.code === 'Space') { e.preventDefault(); pagesParts[page]?.forEach(place); }

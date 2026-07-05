@@ -17,9 +17,11 @@
   #hud .dim { color: #9aa0ac; font-size: 12px; }
   #bar {
     position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
-    display: flex; gap: 10px; background: rgba(15,16,20,.82); padding: 10px 14px;
-    border-radius: 14px; backdrop-filter: blur(8px);
+    display: flex; flex-direction: column; gap: 9px; background: rgba(15,16,20,.82);
+    padding: 12px 18px; border-radius: 14px; backdrop-filter: blur(8px); width: min(680px, 92vw);
   }
+  #btns { display: flex; gap: 10px; justify-content: center; }
+  #seek { width: 100%; accent-color: #c0121a; cursor: pointer; height: 22px; }
   button {
     background: #262a33; color: #eceff4; border: 0; border-radius: 9px;
     padding: 9px 16px; font-size: 14px; cursor: pointer;
@@ -39,11 +41,15 @@
   <span class="dim">点击发光零件安装 · 空格=装完本步 · 拖动旋转视角</span>
 </div>
 <div id="bar">
-  <button id="prev">◀ 上一步</button>
-  <button id="auto" class="acc">▶ 自动拼装</button>
-  <button id="next">下一步 ▶</button>
-  <button id="explode">💥 爆炸视图</button>
-  <button id="reset">⟲ 重来</button>
+  <input id="seek" type="range" min="0" value="0" step="1">
+  <div id="btns">
+    <button id="prev">◀ 上一步</button>
+    <button id="auto" class="acc">▶ 自动拼装</button>
+    <button id="speed">1×</button>
+    <button id="next">下一步 ▶</button>
+    <button id="explode">💥 爆炸视图</button>
+    <button id="reset">⟲ 重来</button>
+  </div>
 </div>
 <div id="prog"></div>
 <script type="importmap">
